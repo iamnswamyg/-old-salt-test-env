@@ -1,1 +1,1 @@
-# kitchen-salt-fullnode
+# salt-test-env

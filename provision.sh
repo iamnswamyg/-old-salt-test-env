@@ -1,6 +1,6 @@
 #!/bin/bash
-SALT_PREFIX="kitchen"
-SCRIPT_PREFIX=${SALT_PREFIX}"-fullnode"
+SALT_PREFIX="salt"
+SCRIPT_PREFIX=${SALT_PREFIX}"-test"
 STORAGE_PATH="/data/lxd/"${SCRIPT_PREFIX}
 IP="10.120.11"
 IFACE="eth0"
@@ -9,7 +9,7 @@ SALT_POOL=${SCRIPT_PREFIX}"-pool"
 SCRIPT_PROFILE_NAME=${SCRIPT_PREFIX}"-profile"
 SCRIPT_BRIDGE_NAME=${SALT_PREFIX}"-br"
 SALT_NAME=${SCRIPT_PREFIX}
-IMAGE=${SALT_PREFIX}
+IMAGE="kitchen-fullnode"
 
 IS_LOCAL=false
 
@@ -41,7 +41,7 @@ do
 done
 
 if ! ${IS_LOCAL}; then
-  echo "This is not master, please use https://github.com/iamnswamyg/salt-infra-image.git to create master"
+  echo "This is not salt test environment node, please use https://github.com/iamnswamyg/kitchen-salt-fullnode.git to create master"
   exit 1
 fi
 
@@ -96,10 +96,7 @@ sudo lxc config device add ${SALT_NAME} ${SALT_NAME}-script-share disk source=${
 sudo lxc config device add ${SALT_NAME} ${SALT_NAME}-salt-share disk source=${PWD}/salt-root/salt path=/srv/salt
 sudo lxc config device add ${SALT_NAME} ${SALT_NAME}-pillar-share disk source=${PWD}/salt-root/pillar path=/srv/pillar
 sudo lxc exec ${SALT_NAME} -- /bin/bash /lxd/${SALT_NAME}.sh
-# save container as image
-lxc stop ${SALT_NAME}
-lxc publish ${SALT_NAME} --alias ${SALT_NAME} 
-lxc start ${SALT_NAME}
+
 
 
 
