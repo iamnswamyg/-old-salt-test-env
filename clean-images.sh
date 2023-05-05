@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_IMAGE="salt-fullnode"
+SCRIPT_IMAGE="kitchen-fullnode"
 
 
 image_names=("${SCRIPT_IMAGE}")

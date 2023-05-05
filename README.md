@@ -1,1 +1,1 @@
-# salt-lxd-fullnode
+# kitchen-salt-fullnode

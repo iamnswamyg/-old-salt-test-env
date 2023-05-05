@@ -1,5 +1,5 @@
 #!/bin/bash
-SALT_PREFIX="salt"
+SALT_PREFIX="kitchen"
 SCRIPT_PREFIX=${SALT_PREFIX}"-fullnode"
 STORAGE_PATH="/data/lxd/"${SCRIPT_PREFIX}
 IP="10.120.11"
@@ -9,7 +9,7 @@ SALT_POOL=${SCRIPT_PREFIX}"-pool"
 SCRIPT_PROFILE_NAME=${SCRIPT_PREFIX}"-profile"
 SCRIPT_BRIDGE_NAME=${SALT_PREFIX}"-br"
 SALT_NAME=${SCRIPT_PREFIX}
-IMAGE=${SALT_PREFIX}"-master"
+IMAGE=${SALT_PREFIX}
 
 IS_LOCAL=false
 
@@ -60,7 +60,7 @@ if ! [ -d ${STORAGE_PATH} ]; then
 fi
 
 # creating the pool
-lxc storage create ${SALT_POOL} dir source=${STORAGE_PATH}
+lxc storage create ${SALT_POOL} btrfs 
 
 #create network bridge
 lxc network create ${SCRIPT_BRIDGE_NAME} ipv6.address=none ipv4.address=${IP_SUBNET} ipv4.nat=true
@@ -87,6 +87,10 @@ lxc init ${IMAGE} ${SALT_NAME} --profile ${SCRIPT_PROFILE_NAME}
 lxc network attach ${SCRIPT_BRIDGE_NAME} ${SALT_NAME} ${IFACE}
 lxc config device set ${SALT_NAME} ${IFACE} ipv4.address ${IP}.2
 lxc start ${SALT_NAME} 
+
+lxc storage volume create ${SALT_POOL} ${SALT_NAME}
+lxc config device add ${SALT_NAME} ${SALT_POOL} disk pool=${SALT_POOL} source=${SALT_NAME} path=${STORAGE_PATH}
+lxc config set ${SALT_NAME} security.nesting=true security.syscalls.intercept.mknod=true security.syscalls.intercept.setxattr=true
 
 sudo lxc config device add ${SALT_NAME} ${SALT_NAME}-script-share disk source=${PWD}/scripts path=/lxd
 sudo lxc config device add ${SALT_NAME} ${SALT_NAME}-salt-share disk source=${PWD}/salt-root/salt path=/srv/salt

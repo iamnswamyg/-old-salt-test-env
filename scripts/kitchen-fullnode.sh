@@ -6,8 +6,12 @@ if ! dpkg-query -W curl >/dev/null 2>&1; then
 fi
 
 if ! dpkg-query -W salt-master >/dev/null 2>&1; then
-  echo "This is not master, please use https://github.com/iamnswamyg/salt-infra-image.git to create master"
-  exit 1
+  mkdir -p /var/lxd-provision
+  cd /var/lxd-provision
+  curl -L https://bootstrap.saltstack.com -o install_salt.sh
+
+  # Install Master
+  sudo sh install_salt.sh -P -M -N stable 3005.1
 fi
 
 if ! dpkg-query -W salt-minion >/dev/null 2>&1; then
